@@ -1,0 +1,1 @@
+The capital of [[Zakai]]'s kingdom, an opulent array of gold and brass, built new and strong over the [[Old City]]. It is full of aristocrats and the bourgeoisie spend their lives here in luxury and overabundance, while the rest are relegated to the slums below.

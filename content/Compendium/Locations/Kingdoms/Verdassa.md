@@ -1,0 +1,1 @@
+A temperate region on the eastern side of the [[Eldlands]]. It is ruled by [[Zakai]], and features the capital city of [[Aj'than]].

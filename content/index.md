@@ -1,6 +1,11 @@
 ---
-title: Welcome to Quartz
+title: Immortals
 ---
+Welcome to the world of Immortals.
 
-This is a blank Quartz installation.
-See the [documentation](https://quartz.jzhao.xyz) for how to get started.
+## Key Concepts
+
+- The [[Immortals]] themselves.
+- Where the Immortals [[Eldlands|live]].
+- The [[Banished]], what [[Tribunal|happens to them]], where they are [[Isles|taken]], and what [[Barges|takes them there]].
+

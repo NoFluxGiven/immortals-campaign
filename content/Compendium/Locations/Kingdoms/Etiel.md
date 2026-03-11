@@ -1,0 +1,1 @@
+A snowy, colder region in the [[Eldlands]], formerly ruled by [[Camelia]]. It is now covered in the [[Dreaming Grotto]], a place where dreams and reality meld together, and made off-limits by the rest of the [[Immortals]].

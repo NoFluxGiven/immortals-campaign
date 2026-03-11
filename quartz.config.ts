@@ -9,7 +9,7 @@ import * as Plugin from "./quartz/plugins"
 const config: QuartzConfig = {
   configuration: {
     pageTitle: "Immortals",
-    pageTitleSuffix: "A Pathfinder 2e Campaign",
+    pageTitleSuffix: " - A Pathfinder 2e Campaign",
     enableSPA: true,
     enablePopovers: true,
     analytics: {
@@ -56,9 +56,9 @@ const config: QuartzConfig = {
   plugins: {
     transformers: [
       Plugin.FrontMatter(),
-      Plugin.CreatedModifiedDate({
-        priority: ["frontmatter", "git", "filesystem"],
-      }),
+      // Plugin.CreatedModifiedDate({
+      //   priority: ["frontmatter", "git", "filesystem"],
+      // }),
       Plugin.SyntaxHighlighting({
         theme: {
           light: "github-light",
