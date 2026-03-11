@@ -1,4 +1,8 @@
 @use "./base.scss";
 // @use "./themes";
 
-// put your custom CSS here!
+.unresolved {
+    color: #ff0000; /* Change to your preferred color */
+    opacity: 0.6;   /* Make it look faded */
+    text-decoration: underline dashed; /* Add a dashed underline */
+}

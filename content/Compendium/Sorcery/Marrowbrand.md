@@ -1,4 +1,5 @@
-![[marrowbrand_trs.png|277]]
+![[marrowbrand_trsbk.png|277]]
+
 A strange brand on the forearm of most [[Banished]].
 
 >[!info] Qualities

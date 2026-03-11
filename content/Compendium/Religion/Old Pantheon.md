@@ -1,0 +1,3 @@
+The traditional gods of the [[Eldlands]], their worship outlawed by the [[Scripture]], and their existence downplayed.
+
+According to the [[Scripture]], the Old Pantheon consisted of a large family of various deities, squabbling and managing various domains of the realm. The [[Eld]], their creator, began to fracture and die, so it poured its power into the [[Immortals]], so that they may continue its legacy as the [[New Gods]].

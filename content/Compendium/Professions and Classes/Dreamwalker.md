@@ -1,0 +1,1 @@
+Individuals who make it their sole duty to delve the depths of the [[Dreaming Grotto]]. They are shunned by society at large, and generally powerful spellcasters, though they usually travel in groups with various strengths.

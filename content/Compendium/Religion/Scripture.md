@@ -2,7 +2,7 @@
 aliases:
   - Eldscript
 ---
-Also known as the **Eldscript**, the Scripture is a set of religious texts derived from the [[Immortals]] and their advisors, the [[Novian]]s' experience with the [[Elder Gods]].
+Also known as the **Eldscript**, the Scripture is a set of religious texts derived from the [[Immortals]] and their advisors, the [[Novian]]s' experience with the [[Eld]].
 
 It details the rise of the [[Immortals]] and their various conquests, alongside serving as a guide for the populace, encouraging obedience.
 

@@ -1,0 +1,1 @@
+Another name to refer to the [[Immortals]]. In the [[Scripture]], they are made out to be so due to the blessing of the [[Eld]], and replace the [[Old Pantheon]].
