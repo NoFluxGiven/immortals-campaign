@@ -1,1 +1,1 @@
-A small community of [[Banished]], living on the [[Isles]]. Before the party arrives, they are barely holding together, but the party's skills begin to cement them as staunch allies, and the community grows.
+A small community of [[Banished]], living on the [[Isles]]. Before the party arrives, they are barely holding together, but the party's skills begin to cement them as staunch allies, and the community grows over time along with their help.
