@@ -1,0 +1,1 @@
+Those who gravely transgress against the [[Immortals]] and are thus sent to the [[Isles]]. They are branded by the [[Marrowbrand]] then sent on the [[Barges]] to the [[Isles]].

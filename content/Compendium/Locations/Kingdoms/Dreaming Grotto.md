@@ -1,0 +1,1 @@
+A place struck by [[Camelia]]'s madness and spellcraft, according to the [[Scripture]] and the other [[Immortals]]' accounts. Dream and reality intermingle here, and it is off-limits, with the punishment of entry being [[Banished|banishment]] or worse.
