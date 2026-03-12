@@ -1,3 +1,5 @@
 >The last of the Immortals, Camelia, was the youngest. A sorceress of great renown, even before her Changing, she sought to use her immortality for her own gain. Rituals and forbidden magic abound in her history, all of the awful and strange and dangerous things she would have died for, were it not for her immortality. While her body would remend itself, though, her mind would not, and one such ritual showed her a truth that broke her. It left her babbling and mad, and in an attempt to escape it all, she cast a great and terrible spell, a culmination of all her dark arts. [[Dreaming Grotto|Her kingdom was a desolate grave]]. A ruin, sunken into the earth, full of the dead and their spirits.
 
-One of the four [[Immortals]].
+One of the four [[Immortals]]. The [[Scripture]] says that before she fell into the [[Dreaming Grotto]], she was doggedly in pursuit of something beyond simple magic.
+
+Her kingdom's symbol is the *feather* - a raven's feather surrounded by arcane glyphs.

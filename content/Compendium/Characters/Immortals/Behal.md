@@ -1,3 +1,5 @@
 >Behal sought innovation above all else, and found the Eldstone veins and other secrets, deep in the earth, bringing them to the surface to combine the arcane and the automaton. His [[K'thun|kingdom's capital city]] was a technological marvel, a great sprawling set of cities and structures with unimaginable scale. Behal himself, over time, became obsessed with determinism, with controlling the outcome of all. They say by the end, he had replaced himself with steel and stone.
 
-One of the four [[Immortals]].
+One of the four [[Immortals]]. He has filled his kingdom with scientists and engineers, and seeks to understand the world's mysteries through technology.
+
+The symbol of his kingdom is the *gears* - three small gears in a triangle formation.
