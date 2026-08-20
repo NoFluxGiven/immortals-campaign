@@ -14,5 +14,5 @@ Welcome to the world of Immortals.
 - **The [[Isles]] are also known as the [[Curselands]].** Most people believe, thanks to the [[Immortals]] and their [[Scripture]], that the lands are full of demons and desolation.
 ## Useful Links
 
-- Check out the [[Guides/Character Building/index|Character Building]] section for information on classes and suggestions for this setting.
+- Check out the [[Guides and Rules/Character Building/index|Character Building]] section for information on classes and suggestions for this setting.
 
