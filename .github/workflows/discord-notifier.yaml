@@ -51,9 +51,9 @@ jobs:
           if [ -n "$ALL_ADDED_FILES" ]; then
             while IFS= read -r file; do
               if [ -f "$file" ]; then
+                # Mimic Quartz URL Sluggification (strip content/, strip .md, lower case, replace spaces with hyphens)
                 SLUG=$(echo "$file" | sed 's/^content\///' | sed 's/\.md$//')
-                # URL-encode spaces to %20 so Discord can parse the markdown link format
-                SLUG_URL=$(echo "$SLUG" | sed 's/ /%20/g')
+                SLUG_URL=$(echo "$SLUG" | tr '[:upper:]' '[:lower:]' | sed 's/ /-/g' | sed 's/(/%28/g; s/)/%29/g')
                 
                 # Robust Title Extraction
                 TITLE=$(grep -m 1 '^title:' "$file" | sed 's/^title:\s*//' | sed 's/^"//;s/"$//' | sed "s/^'//;s/'$//" || true)
@@ -82,7 +82,7 @@ jobs:
             while IFS= read -r file; do
               if [ -f "$file" ]; then
                 SLUG=$(echo "$file" | sed 's/^content\///' | sed 's/\.md$//')
-                SLUG_URL=$(echo "$SLUG" | sed 's/ /%20/g')
+                SLUG_URL=$(echo "$SLUG" | tr '[:upper:]' '[:lower:]' | sed 's/ /-/g' | sed 's/(/%28/g; s/)/%29/g')
                 
                 # Robust Title Extraction
                 TITLE=$(grep -m 1 '^title:' "$file" | sed 's/^title:\s*//' | sed 's/^"//;s/"$//' | sed "s/^'//;s/'$//" || true)
@@ -123,11 +123,17 @@ jobs:
           message: |
             ✨ **The Wiki has been updated**
 
+            ---
+
             🟢 **New:** ${{ steps.wiki_stats.outputs.added_count }} *new notes*
             ${{ steps.wiki_stats.outputs.added_links_block }}
+
             🔄 **Updated:** ${{ steps.wiki_stats.outputs.updated_count }} *existing notes updated*
             ${{ steps.wiki_stats.outputs.updated_links_block }}
+
             📂 **Affected Folders:**
             ${{ steps.wiki_stats.outputs.changed_folders }}
+
+            ---
 
             🔗 [Explore the Wiki](https://immortals-campaign.org)
