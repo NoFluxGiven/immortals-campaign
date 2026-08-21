@@ -12,27 +12,17 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
         with:
-          # Pulls the complete history tree so git log can safely look backwards
           fetch-depth: 0
 
       - name: Analyze Wiki Changes
         id: wiki_stats
         run: |
-          # 1. Find the baseline: Locate the second most recent commit containing [notify]
-          # (The most recent one is the current HEAD pushing right now)
-          BASE_SHA=$(git log --grep="\[notify\]" --format="%H" -n 2 | sed -n '2p' || true)
-
-          # Fallback mechanism: If this is the first [notify] push ever, look back to the parent commit
-          if [ -z "$BASE_SHA" ]; then
-            BASE_SHA="${{ github.event.before }}"
-          fi
-
-          # Absolute safe boundary fallback for initial or empty repository histories
+          BASE_SHA="${{ github.event.before }}"
           if [ "$BASE_SHA" = "0000000000000000000000000000000000000000" ] || [ -z "$BASE_SHA" ]; then
             BASE_SHA="HEAD~1"
           fi
 
-          # 2. Identify Raw File Changes (Accumulated since the historic BASE_SHA)
+          # 1. Identify Raw File Changes
           NEW_FILES=$(git diff --name-only --diff-filter=A $BASE_SHA HEAD -- content/ | grep '\.md$' || true)
           BASE_ADDED=$(echo "$NEW_FILES" | grep -v '^$' | wc -l || echo "0")
 
@@ -55,26 +45,29 @@ jobs:
           TOTAL_UPDATED=$((TOTAL_MODIFIED - DRAFT_PUBLISHED_COUNT))
           if [ "$TOTAL_UPDATED" -lt 0 ]; then TOTAL_UPDATED=0; fi
 
-          # 3. Extract Top 5 Most Recently Added Pages
+          # 2. Extract Top 5 Most Recently Added Pages
           ALL_ADDED_FILES=$(printf "%s\n%s" "$NEW_FILES" "$DRAFT_PUBLISHED_FILES" | grep -v '^$' | sort -u || true)
           ADDED_BLOCK=""
           if [ -n "$ALL_ADDED_FILES" ]; then
             while IFS= read -r file; do
               if [ -f "$file" ]; then
+                # Mimic Quartz URL Sluggification (strip content/, strip .md, lower case, replace spaces with hyphens)
                 SLUG=$(echo "$file" | sed 's/^content\///' | sed 's/\.md$//')
-                SLUG_URL=$(echo "$SLUG" | sed 's/ /-/g' | sed 's/(/%28/g; s/)/%29/g')
+                SLUG_URL=$(echo "$SLUG" | tr '[:upper:]' '[:lower:]' | sed 's/ /-/g' | sed 's/(/%28/g; s/)/%29/g')
                 
+                # Robust Title Extraction
                 TITLE=$(grep -m 1 '^title:' "$file" | sed 's/^title:\s*//' | sed 's/^"//;s/"$//' | sed "s/^'//;s/'$//" || true)
                 if [ -z "$TITLE" ]; then
                   TITLE=$(basename "$file" .md)
                 fi
                 
-                ADDED_BLOCK+="  • [$TITLE](<https://immortals-campaign.org>)"$'\n'
+                # FIX: Appended /$SLUG_URL
+                ADDED_BLOCK+="  • [$TITLE](https://immortals-campaign.org)"$'\n'
               fi
             done < <(while IFS= read -r f; do echo "$(git log -1 --format='%at' -- "$f") $f"; done <<< "$ALL_ADDED_FILES" | sort -rn | cut -d' ' -f2- | head -n 5)
           fi
 
-          # 4. Extract Top 5 Most Recently Refined Pages
+          # 3. Extract Top 5 Most Recently Refined Pages
           REFINED_FILES=""
           if [ -n "$MODIFIED_FILES" ]; then
             while IFS= read -r file; do
@@ -92,17 +85,19 @@ jobs:
                 SLUG=$(echo "$file" | sed 's/^content\///' | sed 's/\.md$//')
                 SLUG_URL=$(echo "$SLUG" | sed 's/ /-/g' | sed 's/(/%28/g; s/)/%29/g')
                 
+                # Robust Title Extraction
                 TITLE=$(grep -m 1 '^title:' "$file" | sed 's/^title:\s*//' | sed 's/^"//;s/"$//' | sed "s/^'//;s/'$//" || true)
                 if [ -z "$TITLE" ]; then
                   TITLE=$(basename "$file" .md)
                 fi
                 
-                UPDATED_BLOCK+="  • [$TITLE](<https://immortals-campaign.org>)"$'\n'
+                # FIX: Appended /$SLUG_URL
+                UPDATED_BLOCK+="  • [$TITLE](<https://immortals-campaign.org/$SLUG_URL>)"$'\n'
               fi
             done < <(while IFS= read -r f; do echo "$(git log -1 --format='%at' -- "$f") $f"; done <<< "$REFINED_FILES" | sort -rn | cut -d' ' -f2- | head -n 5)
           fi
 
-          # 5. Folder Domains Impacted
+          # 4. Folder Domains Impacted
           ALL_FILES=$(git diff --name-only --diff-filter=AM $BASE_SHA HEAD -- content/)
           FOLDERS=$(echo "$ALL_FILES" | xargs -I {} dirname {} | sort -u | grep -v '^\.$' | sed 's/^content\///' | sed 's/^/• `/' | sed 's/$/`/' | tr '\n' ',' | sed 's/,$//' | sed 's/,/\n/g')
           if [ -z "$FOLDERS" ]; then FOLDERS="• None"; fi
@@ -129,6 +124,8 @@ jobs:
           webhook_url: ${{ secrets.WEBHOOK_URL }}
           message: |
             ✨ **The Wiki has been updated**
+
+            *Remember to give it 1 - 2 minutes to fully deploy.*
 
             ---
 
