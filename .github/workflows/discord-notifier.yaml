@@ -1,0 +1,27 @@
+name: Discord Commit Notifier
+
+on:
+  push:
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    # The job-level or step-level 'if' handles the string filtering
+    if: contains(join(github.event.commits.*.message, ' '), '[notify]')
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Send Discord Notification
+        uses: appleboy/discord-action@v1.2.0
+        with:
+          webhook_url: ${{ secrets.WEBHOOK_URL }}
+          message: |
+            🚀 **New Pushed Code Alert!**
+            A commit containing `[notify]` was pushed to **${{ github.repository }}**.
+
+            **Branch:** `${{ github.ref_name }}`
+            **Pushed By:** ${{ github.actor }}
+
+            🔗 [View Changes on GitHub](${{ github.event.compare }})
