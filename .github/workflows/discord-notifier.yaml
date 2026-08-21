@@ -83,7 +83,7 @@ jobs:
             while IFS= read -r file; do
               if [ -f "$file" ]; then
                 SLUG=$(echo "$file" | sed 's/^content\///' | sed 's/\.md$//')
-                SLUG_URL=$(echo "$SLUG" | tr '[:upper:]' '[:lower:]' | sed 's/ /-/g' | sed 's/(/%28/g; s/)/%29/g')
+                SLUG_URL=$(echo "$SLUG" | sed 's/ /-/g' | sed 's/(/%28/g; s/)/%29/g')
                 
                 # Robust Title Extraction
                 TITLE=$(grep -m 1 '^title:' "$file" | sed 's/^title:\s*//' | sed 's/^"//;s/"$//' | sed "s/^'//;s/'$//" || true)
