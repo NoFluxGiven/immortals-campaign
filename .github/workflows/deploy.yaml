@@ -26,7 +26,7 @@ jobs:
                    ]
                  }]
                }' \
-               ${{ secrets.DISCORD_WEBHOOK_URL }}
+               ${{ secrets.WEBHOOK_URL }}
 
       - name: Send Failure Notification
         if: github.event.state == 'failure' || github.event.state == 'error'
@@ -44,4 +44,4 @@ jobs:
                    ]
                  }]
                }' \
-               ${{ secrets.DISCORD_WEBHOOK_URL }}
+               ${{ secrets.WEBHOOK_URL }}
