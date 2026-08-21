@@ -18,10 +18,6 @@ jobs:
         with:
           webhook_url: ${{ secrets.WEBHOOK_URL }}
           message: |
-            🚀 **New Pushed Code Alert!**
-            A commit containing `[notify]` was pushed to **${{ github.repository }}**.
+            📚 **The Wiki has been updated**
 
-            **Branch:** `${{ github.ref_name }}`
-            **Pushed By:** ${{ github.actor }}
-
-            🔗 [View Changes on GitHub](${{ github.event.compare }})
+            🔗 [View the Wiki](https://immortals-campaign.org)
