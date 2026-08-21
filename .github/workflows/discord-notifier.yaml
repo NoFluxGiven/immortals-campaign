@@ -54,7 +54,7 @@ jobs:
       - name: Send Discord Notification
         uses: appleboy/discord-action@v1.2.0
         with:
-          webhook_url: ${{ secrets.DISCORD_WEBHOOK }}
+          webhook_url: ${{ secrets.WEBHOOK_URL }}
           message: |
             📚 **The Wiki has been updated**
 
