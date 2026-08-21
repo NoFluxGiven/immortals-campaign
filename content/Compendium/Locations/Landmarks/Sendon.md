@@ -1,0 +1,1 @@
+The kingdom of [[Tordon]]'s tallest mountain. [[Ion Storm]]s are incessant at its peak, and the [[Mercurial]] - a grand library commissioned by [[Araxen]] - is carved into the side, constantly absorbing and redirecting the lightning.
