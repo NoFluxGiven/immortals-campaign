@@ -125,6 +125,8 @@ jobs:
           message: |
             ✨ **The Wiki has been updated**
 
+            *Remember to give it 1 - 2 minutes to fully deploy.*
+
             ---
 
             🟢 **New:** ${{ steps.wiki_stats.outputs.added_count }} *new notes*
