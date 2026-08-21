@@ -12,56 +12,108 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
         with:
-          fetch-depth: 2
+          # Pulls history to reliably extract real-time git file timestamps
+          fetch-depth: 0
 
-      - name: Calculate Added, Updated, and Folders
-        id: git_stats
+      - name: Analyze Wiki Changes
+        id: wiki_stats
         run: |
-          # Find the parent commit hash safely
           BASE_SHA="${{ github.event.before }}"
           if [ "$BASE_SHA" = "0000000000000000000000000000000000000000" ] || [ -z "$BASE_SHA" ]; then
             BASE_SHA="HEAD~1"
           fi
 
-          # 1. Count Added Files only inside 'content/' (--diff-filter=A)
-          ADDED_FILES=$(git diff --name-only --diff-filter=A $BASE_SHA HEAD -- content/)
-          ADDED_COUNT=$(echo "$ADDED_FILES" | grep -v '^$' | wc -l || echo "0")
+          # 1. Identify Raw File Changes
+          NEW_FILES=$(git diff --name-only --diff-filter=A $BASE_SHA HEAD -- content/ | grep '\.md$' || true)
+          BASE_ADDED=$(echo "$NEW_FILES" | grep -v '^$' | wc -l || echo "0")
 
-          # 2. Count Updated Files only inside 'content/' (--diff-filter=M)
-          UPDATED_FILES=$(git diff --name-only --diff-filter=M $BASE_SHA HEAD -- content/)
-          UPDATED_COUNT=$(echo "$UPDATED_FILES" | grep -v '^$' | wc -l || echo "0")
+          DRAFT_PUBLISHED_FILES=""
+          DRAFT_PUBLISHED_COUNT=0
+          MODIFIED_FILES=$(git diff --name-only --diff-filter=M $BASE_SHA HEAD -- content/ | grep '\.md$' || true)
 
-          # 3. Aggregate all affected folders inside 'content/'
-          ALL_FILES=$(git diff --name-only --diff-filter=AM $BASE_SHA HEAD -- content/)
-
-          # Isolate, deduplicate, and format parent folders
-          FOLDERS=$(echo "$ALL_FILES" | xargs -I {} dirname {} | sort -u | grep -v '^\.$' | sed 's/^/• `/' | sed 's/$/`/' | tr '\n' ',' | sed 's/,$//' | sed 's/,/\n/g')
-
-          # Fallback handling if no files inside 'content/' were added or modified
-          if [ -z "$FOLDERS" ]; then
-            FOLDERS="• None"
+          if [ -n "$MODIFIED_FILES" ]; then
+            while IFS= read -r file; do
+              if git diff $BASE_SHA HEAD -- "$file" | grep -E '^\+\s*draft:\s*false' > /dev/null; then
+                DRAFT_PUBLISHED_COUNT=$((DRAFT_PUBLISHED_COUNT + 1))
+                DRAFT_PUBLISHED_FILES+="$file"$'\n'
+              fi
+            done <<< "$MODIFIED_FILES"
           fi
 
-          # Save counts to GitHub Outputs
-          echo "added_count=$ADDED_COUNT" >> $GITHUB_OUTPUT
-          echo "updated_count=$UPDATED_COUNT" >> $GITHUB_OUTPUT
+          # Core Metrics
+          TOTAL_ADDED=$((BASE_ADDED + DRAFT_PUBLISHED_COUNT))
+          TOTAL_MODIFIED=$(echo "$MODIFIED_FILES" | grep -v '^$' | wc -l || echo "0")
+          TOTAL_UPDATED=$((TOTAL_MODIFIED - DRAFT_PUBLISHED_COUNT))
+          if [ "$TOTAL_UPDATED" -lt 0 ]; then TOTAL_UPDATED=0; fi
 
-          # Save folder block with multiline delimiter handling
+          # 2. Extract Top 5 Most Recently Added Pages
+          ALL_ADDED_FILES=$(printf "%s\n%s" "$NEW_FILES" "$DRAFT_PUBLISHED_FILES" | grep -v '^$' | sort -u || true)
+          ADDED_BLOCK=""
+          if [ -n "$ALL_ADDED_FILES" ]; then
+            while IFS= read -r file; do
+              if [ -f "$file" ]; then
+                SLUG=$(echo "$file" | sed 's/^content\///' | sed 's/\.md$//')
+                TITLE=$(grep -m 1 '^title:' "$file" | sed 's/^title:\s*//' | sed 's/^"//;s/"$//' | sed "s/^'//;s/'$//" || echo "$SLUG")
+                ADDED_BLOCK+="  • [$TITLE](https://immortals-campaign.org)"$'\n'
+              fi
+            done < <(while IFS= read -r f; do echo "$(git log -1 --format='%at' -- "$f") $f"; done <<< "$ALL_ADDED_FILES" | sort -rn | cut -d' ' -f2- | head -n 5)
+          fi
+
+          # 3. Extract Top 5 Most Recently Refined Pages
+          REFINED_FILES=""
+          if [ -n "$MODIFIED_FILES" ]; then
+            while IFS= read -r file; do
+              if ! echo "$DRAFT_PUBLISHED_FILES" | grep -qxF "$file"; then
+                REFINED_FILES+="$file"$'\n'
+              fi
+            done <<< "$MODIFIED_FILES"
+          fi
+          REFINED_FILES=$(echo "$REFINED_FILES" | grep -v '^$')
+
+          UPDATED_BLOCK=""
+          if [ -n "$REFINED_FILES" ]; then
+            while IFS= read -r file; do
+              if [ -f "$file" ]; then
+                SLUG=$(echo "$file" | sed 's/^content\///' | sed 's/\.md$//')
+                TITLE=$(grep -m 1 '^title:' "$file" | sed 's/^title:\s*//' | sed 's/^"//;s/"$//' | sed "s/^'//;s/'$//" || echo "$SLUG")
+                UPDATED_BLOCK+="  • [$TITLE](https://immortals-campaign.org)"$'\n'
+              fi
+            done < <(while IFS= read -r f; do echo "$(git log -1 --format='%at' -- "$f") $f"; done <<< "$REFINED_FILES" | sort -rn | cut -d' ' -f2- | head -n 5)
+          fi
+
+          # 4. Folder Domains Impacted (Stripping 'content/' prefix)
+          ALL_FILES=$(git diff --name-only --diff-filter=AM $BASE_SHA HEAD -- content/)
+          FOLDERS=$(echo "$ALL_FILES" | xargs -I {} dirname {} | sort -u | grep -v '^\.$' | sed 's/^content\///' | sed 's/^/• `/' | sed 's/$/`/' | tr '\n' ',' | sed 's/,$//' | sed 's/,/\n/g')
+          if [ -z "$FOLDERS" ]; then FOLDERS="• None"; fi
+
+          # Export Output Chains to GitHub environment
+          echo "added_count=$TOTAL_ADDED" >> $GITHUB_OUTPUT
+          echo "updated_count=$TOTAL_UPDATED" >> $GITHUB_OUTPUT
+
           echo "changed_folders<<EOF" >> $GITHUB_OUTPUT
           echo "$FOLDERS" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
 
-      - name: Send Discord Notification
+          echo "added_links_block<<EOF" >> $GITHUB_OUTPUT
+          echo "$ADDED_BLOCK" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+          echo "updated_links_block<<EOF" >> $GITHUB_OUTPUT
+          echo "$UPDATED_BLOCK" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Broadcast to Discord Webhook
         uses: appleboy/discord-action@v1.2.0
         with:
           webhook_url: ${{ secrets.WEBHOOK_URL }}
           message: |
-            📚 **The Wiki has been updated**
+            ✨ **The Wiki has been updated**
 
-            🟢 **Documents Added:** ${{ steps.git_stats.outputs.added_count }}
-            🟡 **Documents Updated:** ${{ steps.git_stats.outputs.updated_count }}
+            🟢 **New:** ${{ steps.wiki_stats.outputs.added_count }} *new notes*
+            ${{ steps.wiki_stats.outputs.added_links_block }}
+            🔄 **Updated:** ${{ steps.wiki_stats.outputs.updated_count }} *existing notes updated*
+            ${{ steps.wiki_stats.outputs.updated_links_block }}
+            📂 **Affected Folders:**
+            ${{ steps.wiki_stats.outputs.changed_folders }}
 
-            📂 **Folders Affected:**
-            ${{ steps.git_stats.outputs.changed_folders }}
-
-            🔗 [View the Wiki](https://immortals-campaign.org)
+            🔗 [Explore the Wiki](https://immortals-campaign.org)
