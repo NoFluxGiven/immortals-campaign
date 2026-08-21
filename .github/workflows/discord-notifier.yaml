@@ -1,4 +1,4 @@
-name: Discord Commit Notifier
+name: Discord Wiki Notifier
 
 on:
   push:
@@ -6,18 +6,63 @@ on:
 jobs:
   notify:
     runs-on: ubuntu-latest
-    # The job-level or step-level 'if' handles the string filtering
     if: contains(join(github.event.commits.*.message, ' '), '[notify]')
 
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Calculate Added, Updated, and Folders
+        id: git_stats
+        run: |
+          # Find the parent commit hash safely
+          BASE_SHA="${{ github.event.before }}"
+          if [ "$BASE_SHA" = "0000000000000000000000000000000000000000" ] || [ -z "$BASE_SHA" ]; then
+            BASE_SHA="HEAD~1"
+          fi
+
+          # 1. Count Added Files only (--diff-filter=A)
+          ADDED_FILES=$(git diff --name-only --diff-filter=A $BASE_SHA HEAD)
+          ADDED_COUNT=$(echo "$ADDED_FILES" | grep -v '^$' | wc -l || echo "0")
+
+          # 2. Count Updated Files only (--diff-filter=M)
+          UPDATED_FILES=$(git diff --name-only --diff-filter=M $BASE_SHA HEAD)
+          UPDATED_COUNT=$(echo "$UPDATED_FILES" | grep -v '^$' | wc -l || echo "0")
+
+          # 3. Aggregate all affected folders from both additions and updates
+          ALL_FILES=$(git diff --name-only --diff-filter=AM $BASE_SHA HEAD)
+          FOLDERS=$(echo "$ALL_FILES" | xargs -I {} dirname {} | sort -u | grep -v '^\.$' | sed 's/^/• `/' | sed 's/$/`/' | tr '\n' ',' | sed 's/,$//' | sed 's/,/\n/g')
+
+          # Fallback handling for root file changes
+          TOTAL_CHANGES=$((ADDED_COUNT + UPDATED_COUNT))
+          if [ -z "$FOLDERS" ] && [ "$TOTAL_CHANGES" -gt 0 ]; then
+            FOLDERS="• \`root\`"
+          elif [ -z "$FOLDERS" ]; then
+            FOLDERS="• None"
+          fi
+
+          # Save counts to GitHub Outputs
+          echo "added_count=$ADDED_COUNT" >> $GITHUB_OUTPUT
+          echo "updated_count=$UPDATED_COUNT" >> $GITHUB_OUTPUT
+
+          # Save folder block with multiline delimiter handling
+          echo "changed_folders<<EOF" >> $GITHUB_OUTPUT
+          echo "$FOLDERS" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
 
       - name: Send Discord Notification
         uses: appleboy/discord-action@v1.2.0
         with:
-          webhook_url: ${{ secrets.WEBHOOK_URL }}
+          webhook_url: ${{ secrets.DISCORD_WEBHOOK }}
           message: |
             📚 **The Wiki has been updated**
+
+            🟢 **Documents Added:** ${{ steps.git_stats.outputs.added_count }}
+            🟡 **Documents Updated:** ${{ steps.git_stats.outputs.updated_count }}
+
+            📂 **Folders Affected:**
+            ${{ steps.git_stats.outputs.changed_folders }}
 
             🔗 [View the Wiki](https://immortals-campaign.org)
