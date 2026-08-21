@@ -23,23 +23,22 @@ jobs:
             BASE_SHA="HEAD~1"
           fi
 
-          # 1. Count Added Files only (--diff-filter=A)
-          ADDED_FILES=$(git diff --name-only --diff-filter=A $BASE_SHA HEAD)
+          # 1. Count Added Files only inside 'content/' (--diff-filter=A)
+          ADDED_FILES=$(git diff --name-only --diff-filter=A $BASE_SHA HEAD -- content/)
           ADDED_COUNT=$(echo "$ADDED_FILES" | grep -v '^$' | wc -l || echo "0")
 
-          # 2. Count Updated Files only (--diff-filter=M)
-          UPDATED_FILES=$(git diff --name-only --diff-filter=M $BASE_SHA HEAD)
+          # 2. Count Updated Files only inside 'content/' (--diff-filter=M)
+          UPDATED_FILES=$(git diff --name-only --diff-filter=M $BASE_SHA HEAD -- content/)
           UPDATED_COUNT=$(echo "$UPDATED_FILES" | grep -v '^$' | wc -l || echo "0")
 
-          # 3. Aggregate all affected folders from both additions and updates
-          ALL_FILES=$(git diff --name-only --diff-filter=AM $BASE_SHA HEAD)
+          # 3. Aggregate all affected folders inside 'content/'
+          ALL_FILES=$(git diff --name-only --diff-filter=AM $BASE_SHA HEAD -- content/)
+
+          # Isolate, deduplicate, and format parent folders
           FOLDERS=$(echo "$ALL_FILES" | xargs -I {} dirname {} | sort -u | grep -v '^\.$' | sed 's/^/• `/' | sed 's/$/`/' | tr '\n' ',' | sed 's/,$//' | sed 's/,/\n/g')
 
-          # Fallback handling for root file changes
-          TOTAL_CHANGES=$((ADDED_COUNT + UPDATED_COUNT))
-          if [ -z "$FOLDERS" ] && [ "$TOTAL_CHANGES" -gt 0 ]; then
-            FOLDERS="• \`root\`"
-          elif [ -z "$FOLDERS" ]; then
+          # Fallback handling if no files inside 'content/' were added or modified
+          if [ -z "$FOLDERS" ]; then
             FOLDERS="• None"
           fi
 
