@@ -61,6 +61,7 @@ jobs:
                   TITLE=$(basename "$file" .md)
                 fi
                 
+                # FIX: Appended /$SLUG_URL
                 ADDED_BLOCK+="  • [$TITLE](https://immortals-campaign.org)"$'\n'
               fi
             done < <(while IFS= read -r f; do echo "$(git log -1 --format='%at' -- "$f") $f"; done <<< "$ALL_ADDED_FILES" | sort -rn | cut -d' ' -f2- | head -n 5)
@@ -90,7 +91,8 @@ jobs:
                   TITLE=$(basename "$file" .md)
                 fi
                 
-                UPDATED_BLOCK+="  • [$TITLE](https://immortals-campaign.org)"$'\n'
+                # FIX: Appended /$SLUG_URL
+                UPDATED_BLOCK+="  • [$TITLE](https://immortals-campaign.org/$SLUG_URL)"$'\n'
               fi
             done < <(while IFS= read -r f; do echo "$(git log -1 --format='%at' -- "$f") $f"; done <<< "$REFINED_FILES" | sort -rn | cut -d' ' -f2- | head -n 5)
           fi
