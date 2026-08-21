@@ -1,0 +1,29 @@
+name: Deploy and Notify
+
+on:
+  push:
+    branches:
+      - main # Triggers the workflow on every push to the main branch
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Notify Discord on Success
+        if: success()
+        run: |
+          curl -H "Content-Type: application/json" \
+               -X POST \
+               -d '{
+                 "embeds": [{
+                   "title": "New Wiki Deployment",
+                   "description": "The latest changes have been successfully deployed.",
+                   "color": 3066993,
+                   "fields": [],
+                   "timestamp": "'$(date -u +%Y-%m-%dT%H:%M:%SZ)'"
+                 }]
+               }' \
+               ${{ secrets.WEBHOOK_URL }}
