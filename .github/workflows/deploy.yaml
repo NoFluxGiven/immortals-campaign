@@ -1,29 +1,47 @@
-name: Deploy and Notify
+name: Notify Discord on Cloudflare Deploy
 
 on:
-  push:
-    branches:
-      - main # Triggers the workflow on every push to the main branch
+  # Triggers when Cloudflare or GitHub updates a commit status check
+  status:
 
 jobs:
-  deploy:
+  notify:
     runs-on: ubuntu-latest
+    # Only run if the status update is coming from Cloudflare Pages
+    if: github.event.context == 'Cloudflare Pages'
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
-
-      - name: Notify Discord on Success
-        if: success()
+      - name: Send Success Notification
+        if: github.event.state == 'success'
         run: |
           curl -H "Content-Type: application/json" \
                -X POST \
                -d '{
                  "embeds": [{
-                   "title": "New Wiki Deployment",
-                   "description": "The latest changes have been successfully deployed.",
+                   "title": "🚀 Cloudflare Pages Deployment Success!",
+                   "description": "Cloudflare has successfully built and deployed your commit.",
                    "color": 3066993,
-                   "fields": [],
-                   "timestamp": "'$(date -u +%Y-%m-%dT%H:%M:%SZ)'"
+                   "fields": [
+                     { "name": "Repository", "value": "${{ github.repository }}", "inline": true },
+                     { "name": "Target URL", "value": "${{ github.event.target_url }}" }
+                   ]
                  }]
                }' \
-               ${{ secrets.WEBHOOK_URL }}
+               ${{ secrets.DISCORD_WEBHOOK_URL }}
+
+      - name: Send Failure Notification
+        if: github.event.state == 'failure' || github.event.state == 'error'
+        run: |
+          curl -H "Content-Type: application/json" \
+               -X POST \
+               -d '{
+                 "embeds": [{
+                   "title": "❌ Cloudflare Pages Deployment Failed",
+                   "description": "The internal Cloudflare Pages build failed.",
+                   "color": 15158332,
+                   "fields": [
+                     { "name": "Repository", "value": "${{ github.repository }}", "inline": true },
+                     { "name": "Details", "value": "[View Build Log](${{ github.event.target_url }})" }
+                   ]
+                 }]
+               }' \
+               ${{ secrets.DISCORD_WEBHOOK_URL }}
