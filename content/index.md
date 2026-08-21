@@ -18,5 +18,6 @@ You are the [[Banished]], someone who has fallen on the wrong side of an [[Immor
 - **The [[Isles]] are also known as the [[Curselands]].** Most people believe, thanks to the [[Immortals]] and their [[Scripture]], that the lands are full of demons and desolation.
 ## Useful Links and Guides
 
+- Check out the [[Wiki Help]] page for details on how to read the Wiki.
 - Check out the [[Guides and Rules/Character Building/index|Character Building]] section for information on classes and suggestions for this setting.
 
