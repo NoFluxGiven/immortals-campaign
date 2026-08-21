@@ -12,7 +12,6 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
         with:
-          # Pulls history to reliably extract real-time git file timestamps
           fetch-depth: 0
 
       - name: Analyze Wiki Changes
@@ -53,7 +52,15 @@ jobs:
             while IFS= read -r file; do
               if [ -f "$file" ]; then
                 SLUG=$(echo "$file" | sed 's/^content\///' | sed 's/\.md$//')
-                TITLE=$(grep -m 1 '^title:' "$file" | sed 's/^title:\s*//' | sed 's/^"//;s/"$//' | sed "s/^'//;s/'$//" || echo "$SLUG")
+                # URL-encode spaces to %20 so Discord can parse the markdown link format
+                SLUG_URL=$(echo "$SLUG" | sed 's/ /%20/g')
+                
+                # Robust Title Extraction
+                TITLE=$(grep -m 1 '^title:' "$file" | sed 's/^title:\s*//' | sed 's/^"//;s/"$//' | sed "s/^'//;s/'$//" || true)
+                if [ -z "$TITLE" ]; then
+                  TITLE=$(basename "$file" .md)
+                fi
+                
                 ADDED_BLOCK+="  • [$TITLE](https://immortals-campaign.org)"$'\n'
               fi
             done < <(while IFS= read -r f; do echo "$(git log -1 --format='%at' -- "$f") $f"; done <<< "$ALL_ADDED_FILES" | sort -rn | cut -d' ' -f2- | head -n 5)
@@ -75,13 +82,20 @@ jobs:
             while IFS= read -r file; do
               if [ -f "$file" ]; then
                 SLUG=$(echo "$file" | sed 's/^content\///' | sed 's/\.md$//')
-                TITLE=$(grep -m 1 '^title:' "$file" | sed 's/^title:\s*//' | sed 's/^"//;s/"$//' | sed "s/^'//;s/'$//" || echo "$SLUG")
+                SLUG_URL=$(echo "$SLUG" | sed 's/ /%20/g')
+                
+                # Robust Title Extraction
+                TITLE=$(grep -m 1 '^title:' "$file" | sed 's/^title:\s*//' | sed 's/^"//;s/"$//' | sed "s/^'//;s/'$//" || true)
+                if [ -z "$TITLE" ]; then
+                  TITLE=$(basename "$file" .md)
+                fi
+                
                 UPDATED_BLOCK+="  • [$TITLE](https://immortals-campaign.org)"$'\n'
               fi
             done < <(while IFS= read -r f; do echo "$(git log -1 --format='%at' -- "$f") $f"; done <<< "$REFINED_FILES" | sort -rn | cut -d' ' -f2- | head -n 5)
           fi
 
-          # 4. Folder Domains Impacted (Stripping 'content/' prefix)
+          # 4. Folder Domains Impacted
           ALL_FILES=$(git diff --name-only --diff-filter=AM $BASE_SHA HEAD -- content/)
           FOLDERS=$(echo "$ALL_FILES" | xargs -I {} dirname {} | sort -u | grep -v '^\.$' | sed 's/^content\///' | sed 's/^/• `/' | sed 's/$/`/' | tr '\n' ',' | sed 's/,$//' | sed 's/,/\n/g')
           if [ -z "$FOLDERS" ]; then FOLDERS="• None"; fi
