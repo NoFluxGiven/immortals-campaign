@@ -2,4 +2,4 @@
 
 One of the four [[Immortals]]. He has filled his kingdom with aristocrats, merchants, and sycophants, valuing opulence and soft power above all else.
 
-His kingdom's symbol is the *hands*-  two hands crossing one another with eyes on their palms, one closed, one open.
+His [[Verdassa|kingdom]]'s symbol is the *hands*-  two hands crossing one another, one palm up and the other palm down, with an eye in its centre.

@@ -1,1 +1,3 @@
 A temperate region on the eastern side of the [[Eldlands]]. It is ruled by [[Zakai]], and features the capital city of [[Aj'than]].
+
+Referred to by some as the "whispering kingdom", it is notable for [[Zakai]]'s dense web of political allies, spies, and aristocrats. Its citizens understand that behind every wealthy donor there is a creeping shadow, and the separation between the ruling class, who often rub shoulders with [[Zakai]] himself, and the underclass, who dispose of or protect their secrets for wealth and clout, is as clear as can be.
