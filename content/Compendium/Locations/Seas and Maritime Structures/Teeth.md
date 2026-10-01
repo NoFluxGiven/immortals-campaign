@@ -2,14 +2,7 @@
 Region: Isles
 ---
 >[!quote]
->Her sail raised<br>
->It flutters high<br>
->Luck, sailor's bade<br>
->A seahawk cries<br>
->They lurch 'pon Death<br>
->for Teeth It bares<br>
->and broken berth<br>
->Lay sunken there<br>
+>Her sail raised<br>It flutters high<br>Luck, sailor's bade<br>A seahawk cries<br>They lurch 'pon Death<br>for Teeth It bares<br>and broken berth<br>Lay sunken there<br>
 ><br>
 >> *Old sailor's rhyme*
 
