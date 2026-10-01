@@ -73,6 +73,7 @@ jobs:
                 ADDED_BLOCK+="  • [$TITLE](https://immortals-campaign.org)"$'\n'
               fi
             done < <(while IFS= read -r f; do echo "$(git log -1 --format='%at' -- "$f") $f"; done <<< "$ALL_ADDED_FILES" | sort -rn | cut -d' ' -f2-)
+            
           fi
           ADDED_BLOCK=${ADDED_BLOCK%$'\n'}
 
