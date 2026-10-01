@@ -137,14 +137,14 @@ jobs:
           message: |
             ✨ **The Wiki has been updated**
 
+            🔗 [Explore the Wiki](https://immortals-campaign.org)
+
             *Remember to give it 1 - 2 minutes to fully deploy.*
 
-            ---
+            ===
 
-            **Commit Notes:**
+            📝 **Commit Notes:**
             ${{ steps.wiki_stats.outputs.commit_summaries }}
-
-            ---
 
             🟢 **New:** ${{ steps.wiki_stats.outputs.added_count }} *new notes*
             ${{ steps.wiki_stats.outputs.added_links_block }}
@@ -154,7 +154,3 @@ jobs:
 
             📂 **Affected Folders:**
             ${{ steps.wiki_stats.outputs.changed_folders }}
-
-            ---
-
-            🔗 [Explore the Wiki](https://immortals-campaign.org)
