@@ -13,8 +13,8 @@
 }
 
 .timer-reveal {
-  animation: revealBlur 1.5s ease-out 2s forwards;
-  filter: blur(20px);
+  animation: revealBlur 15s ease-out 20s forwards;
+  filter: blur(40px);
   opacity: 0;
   pointer-events: none;
 }
