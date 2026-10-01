@@ -18,6 +18,9 @@ jobs:
         id: wiki_stats
         run: |
           COMMIT_SUMMARIES=$(jq -r '[.commits[].message | match("\\{([^}]*)\\}"; "g").captures[0].string] | map("• " + .) | join("\n")' "$GITHUB_EVENT_PATH")
+          if [ -z "$COMMIT_SUMMARIES" ]; then
+            COMMIT_SUMMARIES="*Not provided*."
+          fi
           OUTPUT_DELIMITER="COMMIT_SUMMARIES_$(cat /proc/sys/kernel/random/uuid)"
           {
             echo "commit_summaries<<$OUTPUT_DELIMITER"

@@ -1,0 +1,1 @@
+Yoma was a prodigious [Vanaran](https://2e.aonprd.com/Ancestries.aspx?ID=55) scholar working under [[Araxen]]. They produced a number of highly influential historical accounts early in [[Araxen]]'s reign, noted for their flowery, almost proverbial language and writing style.
