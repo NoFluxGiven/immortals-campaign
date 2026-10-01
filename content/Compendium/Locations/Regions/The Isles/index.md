@@ -2,6 +2,7 @@
 aliases:
   - Curselands
   - Isles
+title: The Isles
 ---
 Many islands, separated by the [[Roil]]. Where the [[Banished]] explore and make their homestead, while they prepare for vengeance...
 ## Islands

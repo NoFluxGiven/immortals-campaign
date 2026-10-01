@@ -1,5 +1,5 @@
 ---
-title: Immortals
+title: Immortals Campaign
 ---
 **Welcome to the world of Immortals.**
 

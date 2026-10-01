@@ -1,7 +1,10 @@
 ---
 Region: Isles
 ---
-
+>[!quote]
+>The sea is against us. Every time we catch a glimpse of land, a storm is summoned, and the waves veil it from view. Even the sun hides from us, darkening the sky and making the cold that whips against us cut to the bone. Navigation is exhausting. The crew, with each day, loses patience, and morale. I am not sure how much longer we can do this. We *must* reach port.
+>
+>> *Captain [[Argella Mendina|Argella]], an excerpt from her ship log, on the first voyage westward*. Miraculously, they returned with only a few scratches upon the ship's underside.
 
 A turbulent sea to the west of the [[Western Sea]], known for surrounding the [[Isles]].
 

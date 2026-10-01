@@ -1,1 +1,3 @@
 A place struck by [[Camelia]]'s madness and spellcraft, according to the [[Scripture]] and the other [[Immortals]]' accounts. Dream and reality intermingle here, and it is off-limits, with the punishment of entry being [[Banished|banishment]] or worse.
+
+The Grotto reaches far from the region's centre, but fades as it does. The residents on the outskirts of [[Etiel]], ever hardy, contend with the cold and the phenomena the Grotto produces.
