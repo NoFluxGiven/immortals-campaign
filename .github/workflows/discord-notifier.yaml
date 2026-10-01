@@ -17,6 +17,18 @@ jobs:
       - name: Analyze Wiki Changes
         id: wiki_stats
         run: |
+          COMMIT_SUMMARIES=$(jq -r '[.commits[].message | match("\\{([^}]*)\\}"; "g").captures[0].string] | map("• " + .) | join("\n")' "$GITHUB_EVENT_PATH")
+          if [ -n "$COMMIT_SUMMARIES" ]; then
+            COMMIT_SUMMARIES=""$'\n'"$COMMIT_SUMMARIES"
+          fi
+
+          OUTPUT_DELIMITER="COMMIT_SUMMARIES_$(cat /proc/sys/kernel/random/uuid)"
+          {
+            echo "commit_summaries<<$OUTPUT_DELIMITER"
+            printf '%s\n' "$COMMIT_SUMMARIES"
+            echo "$OUTPUT_DELIMITER"
+          } >> "$GITHUB_OUTPUT"
+
           BASE_SHA="${{ github.event.before }}"
           if [ "$BASE_SHA" = "0000000000000000000000000000000000000000" ] || [ -z "$BASE_SHA" ]; then
             BASE_SHA="HEAD~1"
@@ -45,7 +57,7 @@ jobs:
           TOTAL_UPDATED=$((TOTAL_MODIFIED - DRAFT_PUBLISHED_COUNT))
           if [ "$TOTAL_UPDATED" -lt 0 ]; then TOTAL_UPDATED=0; fi
 
-          # 2. Extract Top 5 Most Recently Added Pages
+          # 2. Extract Recently Added Pages
           ALL_ADDED_FILES=$(printf "%s\n%s" "$NEW_FILES" "$DRAFT_PUBLISHED_FILES" | grep -v '^$' | sort -u || true)
           ADDED_BLOCK=""
           if [ -n "$ALL_ADDED_FILES" ]; then
@@ -64,10 +76,10 @@ jobs:
                 # FIX: Appended /$SLUG_URL
                 ADDED_BLOCK+="  • [$TITLE](https://immortals-campaign.org)"$'\n'
               fi
-            done < <(while IFS= read -r f; do echo "$(git log -1 --format='%at' -- "$f") $f"; done <<< "$ALL_ADDED_FILES" | sort -rn | cut -d' ' -f2- | head -n 5)
+            done < <(while IFS= read -r f; do echo "$(git log -1 --format='%at' -- "$f") $f"; done <<< "$ALL_ADDED_FILES" | sort -rn | cut -d' ' -f2-)
           fi
 
-          # 3. Extract Top 5 Most Recently Refined Pages
+          # 3. Extract Recently Refined Pages
           REFINED_FILES=""
           if [ -n "$MODIFIED_FILES" ]; then
             while IFS= read -r file; do
@@ -94,7 +106,7 @@ jobs:
                 # FIX: Appended /$SLUG_URL
                 UPDATED_BLOCK+="  • [$TITLE](<https://immortals-campaign.org/$SLUG_URL>)"$'\n'
               fi
-            done < <(while IFS= read -r f; do echo "$(git log -1 --format='%at' -- "$f") $f"; done <<< "$REFINED_FILES" | sort -rn | cut -d' ' -f2- | head -n 5)
+            done < <(while IFS= read -r f; do echo "$(git log -1 --format='%at' -- "$f") $f"; done <<< "$REFINED_FILES" | sort -rn | cut -d' ' -f2-)
           fi
 
           # 4. Folder Domains Impacted
@@ -126,6 +138,11 @@ jobs:
             ✨ **The Wiki has been updated**
 
             *Remember to give it 1 - 2 minutes to fully deploy.*
+
+            ---
+
+            **Commit Notes:**
+            ${{ steps.wiki_stats.outputs.commit_summaries }}
 
             ---
 
