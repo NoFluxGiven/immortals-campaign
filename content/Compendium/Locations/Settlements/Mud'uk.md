@@ -1,0 +1,1 @@
+A tiny village found on the outskirts of [[Etiel]].
