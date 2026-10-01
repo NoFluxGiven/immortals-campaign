@@ -1,0 +1,1 @@
+What scholars of [[Araxen]] refer to when describing the [[Immortals]]' monopoly on religious faith in the [[Eldlands]].

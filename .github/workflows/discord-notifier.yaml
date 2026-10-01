@@ -1,0 +1,193 @@
+name: Discord Wiki Notifier
+
+on:
+  push:
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    if: contains(join(github.event.commits.*.message, ' '), '[notify]')
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Analyze Wiki Changes
+        id: wiki_stats
+        run: |
+          BASE_SHA="${{ github.event.before }}"
+          HEAD_SHA="${{ github.sha }}"
+          HEAD_TRAILERS=$(git show -s --format=%B "$HEAD_SHA" | git interpret-trailers --parse)
+          BASE_OVERRIDE=$(printf '%s\n' "$HEAD_TRAILERS" | sed -n 's/^Notify-Base:[[:space:]]*//p' | tail -n 1)
+          HEAD_OVERRIDE=$(printf '%s\n' "$HEAD_TRAILERS" | sed -n 's/^Notify-Head:[[:space:]]*//p' | tail -n 1)
+          if [ -n "$BASE_OVERRIDE" ]; then BASE_SHA="$BASE_OVERRIDE"; fi
+          if [ -n "$HEAD_OVERRIDE" ]; then HEAD_SHA="$HEAD_OVERRIDE"; fi
+
+          if ! [[ "$HEAD_SHA" =~ ^[[:xdigit:]]{7,64}$ ]] || ! git cat-file -e "${HEAD_SHA}^{commit}" 2>/dev/null; then
+            echo "::error::Notify-Head must identify an available commit SHA." >&2
+            exit 1
+          fi
+
+          if [ "$BASE_SHA" = "0000000000000000000000000000000000000000" ] || [ -z "$BASE_SHA" ]; then
+            COMMIT_RANGE="$HEAD_SHA"
+          else
+            if ! [[ "$BASE_SHA" =~ ^[[:xdigit:]]{7,64}$ ]] || ! git cat-file -e "${BASE_SHA}^{commit}" 2>/dev/null; then
+              echo "::error::Notify-Base must identify an available commit SHA." >&2
+              exit 1
+            fi
+            if ! git merge-base --is-ancestor "$BASE_SHA" "$HEAD_SHA"; then
+              echo "::error::Notify-Base must be an ancestor of Notify-Head." >&2
+              exit 1
+            fi
+            COMMIT_RANGE="$BASE_SHA..$HEAD_SHA"
+          fi
+
+          COMMIT_SUMMARIES=$(git log --reverse --format=%B "$COMMIT_RANGE" | grep -oE '\{[^}]*\}' | sed -E 's/^\{(.*)\}$/• \1/' || true)
+          if [ -z "$COMMIT_SUMMARIES" ]; then
+            COMMIT_SUMMARIES="*Not provided*."
+          fi
+          OUTPUT_DELIMITER="COMMIT_SUMMARIES_$(cat /proc/sys/kernel/random/uuid)"
+          {
+            echo "commit_summaries<<$OUTPUT_DELIMITER"
+            printf '%s\n' "$COMMIT_SUMMARIES"
+            echo "$OUTPUT_DELIMITER"
+          } >> "$GITHUB_OUTPUT"
+
+          # 1. Identify Raw File Changes
+          RAW_NEW_FILES=$(git log --diff-merges=first-parent --diff-filter=A --name-only --format= "$COMMIT_RANGE" -- content/ | grep '\.md$' | sort -u || true)
+          NEW_FILES=""
+          while IFS= read -r file; do
+            if [ -n "$file" ] && [ -f "$file" ]; then
+              NEW_FILES+="$file"$'\n'
+            fi
+          done <<< "$RAW_NEW_FILES"
+          NEW_FILES=${NEW_FILES%$'\n'}
+          BASE_ADDED=$(printf '%s\n' "$NEW_FILES" | awk 'NF { count++ } END { print count + 0 }')
+
+          DRAFT_PUBLISHED_FILES=""
+          DRAFT_PUBLISHED_COUNT=0
+          RAW_MODIFIED_FILES=$(git log --diff-merges=first-parent --diff-filter=M --name-only --format= "$COMMIT_RANGE" -- content/ | grep '\.md$' | sort -u || true)
+          MODIFIED_FILES=""
+          while IFS= read -r file; do
+            if [ -n "$file" ] && [ -f "$file" ] && ! printf '%s\n' "$NEW_FILES" | grep -qxF "$file"; then
+              MODIFIED_FILES+="$file"$'\n'
+            fi
+          done <<< "$RAW_MODIFIED_FILES"
+          MODIFIED_FILES=${MODIFIED_FILES%$'\n'}
+
+          if [ -n "$MODIFIED_FILES" ]; then
+            while IFS= read -r file; do
+              if git log --diff-merges=first-parent -p "$COMMIT_RANGE" -- "$file" | grep -E '^\+\s*draft:\s*false' > /dev/null; then
+                DRAFT_PUBLISHED_COUNT=$((DRAFT_PUBLISHED_COUNT + 1))
+                DRAFT_PUBLISHED_FILES+="$file"$'\n'
+              fi
+            done <<< "$MODIFIED_FILES"
+          fi
+
+          # Core Metrics
+          TOTAL_ADDED=$((BASE_ADDED + DRAFT_PUBLISHED_COUNT))
+          TOTAL_MODIFIED=$(printf '%s\n' "$MODIFIED_FILES" | awk 'NF { count++ } END { print count + 0 }')
+          TOTAL_UPDATED=$((TOTAL_MODIFIED - DRAFT_PUBLISHED_COUNT))
+          if [ "$TOTAL_UPDATED" -lt 0 ]; then TOTAL_UPDATED=0; fi
+
+          # 2. Extract Recently Added Pages
+          ALL_ADDED_FILES=$(printf "%s\n%s" "$NEW_FILES" "$DRAFT_PUBLISHED_FILES" | grep -v '^$' | sort -u || true)
+          ADDED_BLOCK=""
+          if [ -n "$ALL_ADDED_FILES" ]; then
+            while IFS= read -r file; do
+              if [ -f "$file" ]; then
+                # Preserve Quartz path casing while replacing spaces with hyphens
+                SLUG=$(echo "$file" | sed 's/^content\///' | sed 's/\.md$//')
+                SLUG_URL=$(echo "$SLUG" | sed 's/ /-/g' | sed 's/(/%28/g; s/)/%29/g')
+                
+                # Robust Title Extraction
+                TITLE=$(grep -m 1 '^title:' "$file" | sed 's/^title:\s*//' | sed 's/^"//;s/"$//' | sed "s/^'//;s/'$//" || true)
+                if [ -z "$TITLE" ]; then
+                  TITLE=$(basename "$file" .md)
+                fi
+                
+                ADDED_BLOCK+="  • [$TITLE](<https://immortals-campaign.org/$SLUG_URL>)"$'\n'
+              fi
+            done < <(while IFS= read -r f; do echo "$(git log --diff-merges=first-parent -1 --format='%at' "$COMMIT_RANGE" -- "$f") $f"; done <<< "$ALL_ADDED_FILES" | sort -rn | cut -d' ' -f2-)
+            
+          fi
+          ADDED_BLOCK=${ADDED_BLOCK%$'\n'}
+
+          # 3. Extract Recently Refined Pages
+          REFINED_FILES=""
+          if [ -n "$MODIFIED_FILES" ]; then
+            while IFS= read -r file; do
+              if ! echo "$DRAFT_PUBLISHED_FILES" | grep -qxF "$file"; then
+                REFINED_FILES+="$file"$'\n'
+              fi
+            done <<< "$MODIFIED_FILES"
+          fi
+          REFINED_FILES=$(echo "$REFINED_FILES" | grep -v '^$' || true)
+
+          UPDATED_BLOCK=""
+          if [ -n "$REFINED_FILES" ]; then
+            while IFS= read -r file; do
+              if [ -f "$file" ]; then
+                SLUG=$(echo "$file" | sed 's/^content\///' | sed 's/\.md$//')
+                SLUG_URL=$(echo "$SLUG" | sed 's/ /-/g' | sed 's/(/%28/g; s/)/%29/g')
+                
+                # Robust Title Extraction
+                TITLE=$(grep -m 1 '^title:' "$file" | sed 's/^title:\s*//' | sed 's/^"//;s/"$//' | sed "s/^'//;s/'$//" || true)
+                if [ -z "$TITLE" ]; then
+                  TITLE=$(basename "$file" .md)
+                fi
+                
+                # FIX: Appended /$SLUG_URL
+                UPDATED_BLOCK+="  • [$TITLE](<https://immortals-campaign.org/$SLUG_URL>)"$'\n'
+              fi
+            done < <(while IFS= read -r f; do echo "$(git log --diff-merges=first-parent -1 --format='%at' "$COMMIT_RANGE" -- "$f") $f"; done <<< "$REFINED_FILES" | sort -rn | cut -d' ' -f2-)
+          fi
+          UPDATED_BLOCK=${UPDATED_BLOCK%$'\n'}
+
+          # 4. Folder Domains Impacted
+          ALL_FILES=$(printf '%s\n%s' "$NEW_FILES" "$MODIFIED_FILES" | grep -v '^$' | sort -u || true)
+          FOLDERS=$(echo "$ALL_FILES" | xargs -I {} dirname {} | sort -u | grep -v '^\.$' | sed 's/^content\///' | sed 's/^/• `/' | sed 's/$/`/' | tr '\n' ',' | sed 's/,$//' | sed 's/,/\n/g' || true)
+          if [ -z "$FOLDERS" ]; then FOLDERS="• None"; fi
+
+          # Export Output Chains to GitHub environment
+          echo "added_count=$TOTAL_ADDED" >> $GITHUB_OUTPUT
+          echo "updated_count=$TOTAL_UPDATED" >> $GITHUB_OUTPUT
+
+          echo "changed_folders<<EOF" >> $GITHUB_OUTPUT
+          echo "$FOLDERS" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+          echo "added_links_block<<EOF" >> $GITHUB_OUTPUT
+          echo "$ADDED_BLOCK" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+          echo "updated_links_block<<EOF" >> $GITHUB_OUTPUT
+          echo "$UPDATED_BLOCK" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Broadcast to Discord Webhook
+        uses: appleboy/discord-action@v1.2.0
+        with:
+          webhook_url: ${{ secrets.WEBHOOK_URL }}
+          message: |
+            ✨ **The Wiki has been updated**
+
+            🔗 [Explore the Wiki](<https://immortals-campaign.org>)
+
+            *Remember to give it 1 - 2 minutes to fully deploy.*
+
+            ===
+
+            📝 **Commit Notes:**
+            ${{ steps.wiki_stats.outputs.commit_summaries }}
+
+            🟢 **New:** ${{ steps.wiki_stats.outputs.added_count }} *new notes*
+            ${{ steps.wiki_stats.outputs.added_links_block }}
+
+            🔄 **Updated:** ${{ steps.wiki_stats.outputs.updated_count }} *existing notes updated*
+            ${{ steps.wiki_stats.outputs.updated_links_block }}
+
+            📂 **Affected Folders:**
+            ${{ steps.wiki_stats.outputs.changed_folders }}

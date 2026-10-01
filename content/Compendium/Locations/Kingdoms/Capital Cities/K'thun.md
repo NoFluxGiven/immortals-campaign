@@ -1,0 +1,1 @@
+The capital of [[Behal]]'s kingdom. Once a Victorian style city, it is now a winding, near inconceivably colossal mesh of cuboid structures, held together by great chains and floating in the air, thanks to the [[Eldstone]] - magical ore Behal mined from the lands with his steel [[Drillbeast]]s.

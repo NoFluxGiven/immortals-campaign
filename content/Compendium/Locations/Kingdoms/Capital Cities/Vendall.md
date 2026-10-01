@@ -1,0 +1,1 @@
+The capital of [[Araxen]]'s kingdom, built in the shadow of the [[Arxis]], a monument to the Shadow War a thousand years ago. It is full of scholars and home to many libraries and athenaeum. Living in complacency is discouraged, as knowledge is paramount, and constant vigilance is needed to remain ahead of your peers.
