@@ -83,3 +83,14 @@ article a {
     fill: var(--secondary) !important; /* For SVG vector folder graphics */
   }
 }
+
+/* quartz/styles/custom.scss */
+
+/* Strips click functions and layouts from unresolvable internal paths */
+article a.internal.broken {
+  color: inherit !important;          /* Blends color to normal text */
+  text-decoration: none !important;    /* Clears lines */
+  border-bottom: none !important;      /* Drops Quartz theme specific outlines */
+  cursor: text !important;             /* Swaps selection arrow back to standard I-beam */
+  pointer-events: none !important;     /* Disables the link from being clickable */
+}
