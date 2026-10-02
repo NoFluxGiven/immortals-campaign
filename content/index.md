@@ -18,6 +18,7 @@ You are the [[Banished]], someone who has fallen on the wrong side of an [[Immor
 - **The [[Compendium/index|Compendium]] is vast,** and full of secrets. Read carefully.
 - **The [[Isles]] are also known as the [[Curselands]].** Most people believe, thanks to the [[Immortals]] and their [[Scripture]], that the lands are full of demons and desolation.
 <div class="timer-reveal">Follow the deer, then follow its dream.</div>
+
 ## Useful Links and Guides
 
 - Check out the [[Wiki Help]] page for details on how to read the Wiki.

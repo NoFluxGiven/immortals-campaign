@@ -113,7 +113,7 @@ plugins:
   - source: "@quartz-themes/core"
     enabled: true
     options:
-      theme: default
+      theme: minimal
       mode: both
   - source: "@quartz-community/remove-draft"
     enabled: true
@@ -277,6 +277,12 @@ plugins:
     enabled: true
     options: {}
     order: 45
+  - source: github:saberzero1/quartz-themes
+    enabled: true
+    options:
+      theme: tokyo-night
+      mode: both
+    order: 10
 layout:
   groups:
     toolbar:
