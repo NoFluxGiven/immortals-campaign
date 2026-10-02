@@ -1,0 +1,11 @@
+{
+  "version": "1.0.0",
+  "plugins": {
+    "unlisted-pages": {
+      "source": "github:quartz-community/unlisted-pages",
+      "resolved": "https://github.com/quartz-community/unlisted-pages.git",
+      "commit": "e7bd3729703bd247fb578e88656cddd9df166452",
+      "installedAt": "2026-10-01T05:13:43.366Z"
+    }
+  }
+}
