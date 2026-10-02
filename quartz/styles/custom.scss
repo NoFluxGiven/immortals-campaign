@@ -53,3 +53,33 @@ article a {
     background-color: transparent !important;
   }
 }
+
+/* quartz/styles/custom.scss */
+
+/* 1. Force the file tree/explorer folder items to lose their yellow tints */
+.explorer, .folder-outer, .folder-container {
+  button, a, span {
+    color: inherit !important;
+    background-color: transparent !important;
+    
+    &:hover {
+      background-color: transparent !important;
+    }
+  }
+}
+
+/* 2. Clear out yellow styling on the automatically generated Folder Page directories */
+.page-listing, .folder-listing {
+  a.internal, a.internal.folder {
+    color: var(--secondary) !important; /* Forces it to use your standard theme link color */
+    background: transparent !important;
+    background-color: transparent !important;
+    border-bottom: none !important;
+  }
+  
+  /* If you are using folder icons/collapsible buttons */
+  .folder-icon, .folder-toggle {
+    color: var(--secondary) !important;
+    fill: var(--secondary) !important; /* For SVG vector folder graphics */
+  }
+}
