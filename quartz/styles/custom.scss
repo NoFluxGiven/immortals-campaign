@@ -18,3 +18,27 @@
   opacity: 0;
   pointer-events: none;
 }
+
+.timer-reveal-slower {
+  animation: revealBlur 20s ease-out 25s forwards;
+  filter: blur(40px);
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Target only links that end exactly with #secret */
+article a.internal[href$="#secret"], 
+article a.external[href$="#secret"] {
+    color: inherit !important;
+    text-decoration: none !important;
+    border-bottom: none !important;
+    cursor: text !important;
+}
+
+/* Ensure no visual hover triggers for secret links */
+article a.internal[href$="#secret"]:hover, 
+article a.external[href$="#secret"]:hover {
+    color: inherit !important;
+    text-decoration: none !important;
+    background: none !important;
+}
