@@ -1,6 +1,8 @@
 ---
 aliases:
   - it-was-only-them
+  - compendium/natural-phenomena/it-was-only-them
+  - compendium/it-was-only-them
 unlisted: true
 ---
 She found me roots of relish sweet,  
