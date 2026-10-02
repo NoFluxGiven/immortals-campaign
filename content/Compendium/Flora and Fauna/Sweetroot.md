@@ -1,0 +1,1 @@
+A type of shrub that grows **upside** down. The roots have an earthy, sweet flavour when cooked, often made into a relish.

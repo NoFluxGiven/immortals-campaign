@@ -1,0 +1,1 @@
+A sweet tasting berry found in [[Etiel]], and are recognised as a hardy plant that survives easily in the cold of winter. They are a translucent **golden** colour, and filled with a viscous liquid that resembles honey. [[Snowcoat Deer]] eat these berries during winter.

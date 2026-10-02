@@ -1,0 +1,1 @@
+A deer native to the region of [[Etiel]], so named for their white coat. They are generally quiet and docile animals, wandering around in winter. They are very often used as an [[Etiel|Etielan]] symbol that represents [[Dreamweft#secret|dreams]] or [[Dreamweft#secret|dreaming]].

@@ -5,3 +5,5 @@ The result of the [[Dreaming Grotto]] intermingling, temporarily, with reality. 
 >>*Excerpt from an [[Etiel|Etielan]] hunter's diary, found in the village of [[Mud'uk]]*
 
 <div class="timer-reveal"> She stood, feet bare, upon the snow, wracked with frost and silence, ice creeping its way across the lake. Time had no purchase, here. It was only them. It was only them.</div>
+
+<div class="timer-reveal-slower">/it-was-only-them</div>
