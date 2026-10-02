@@ -42,3 +42,14 @@ article a.external[href$="#secret"]:hover {
     text-decoration: none !important;
     background: none !important;
 }
+
+
+article a {
+  background: transparent !important;
+  background-color: transparent !important;
+  
+  &:hover {
+    background: transparent !important;
+    background-color: transparent !important;
+  }
+}
