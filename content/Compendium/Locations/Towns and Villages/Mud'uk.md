@@ -1,0 +1,1 @@
+A tiny village found on the outskirts of [[Etiel]], just outside of the [[Dreaming Grotto]]. It is somewhat famous for its tales of strange phenomena, and rumoured to be the birthplace of [[Camelia]]. Nowadays, it is a stop for [[Dreamwalker]]s before their descent into the [[Dreaming Grotto]], with the villagefolk offering banquets as rituals for good fortune.
