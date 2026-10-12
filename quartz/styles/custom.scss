@@ -94,3 +94,13 @@ article a.internal.broken {
   cursor: text !important;             /* Swaps selection arrow back to standard I-beam */
   pointer-events: none !important;     /* Disables the link from being clickable */
 }
+
+/* Secret only visible in DARK mode */
+[saved-theme="light"] .dark-mode-secret {
+  display: none !important;
+}
+
+/* Secret only visible in LIGHT mode */
+[saved-theme="dark"] .light-mode-secret {
+  display: none !important;
+}
