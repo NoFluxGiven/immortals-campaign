@@ -9,9 +9,9 @@ She stood, feet bare, upon the snow, wracked with frost and silence, ice creepin
 
 The wind had burned red across their cheeks. Travel was harder now, the throes of a blizzard forming. No beast lumbered afore, and all they carried was themselves.
 
-They watched the gloom fall, a snow's shadow, heaving. Death, it seemed, was embracing them slowly. In this desolation, a torch bore, burning bright orange against the white snow and the black sky. She had turned and spoke, but the wind stole it. Wisps of white covered their eyes, and so they could not behold one another. Not truly.
+<span class="dark-mode-secret">They watched the gloom fall, a snow's shadow, heaving. Death, it seemed, was embracing them slowly. In this desolation, a torch bore, burning bright orange against the white snow and the black sky. She had turned and spoke, but the wind stole it. Wisps of white covered their eyes, and so they could not behold one another. Not truly.</span><span class="light-mode-secret">They watched the light rise, a blinding white, spreading far before them. What little it did to ease them was enough. She had turned and spoke, but her eyes took the words, ended them. The storm had passed, but it still sat, looming and dangerous.</span>
 
-The first to fall was <span class="scramble-text">the Dreamer</span>. The cold bites venom, and her veins were coarse with it. Then <span class="scramble-text">the Dream</span>. They laid there, windswept and snowbound. They looked into the eyes of the other, and saw light.
+<span class="dark-mode-secret">The first to fall was <span class="scramble-text">the Dreamer</span>. The cold bites venom, and her veins were coarse with it. Then <span class="scramble-text">the Dream</span>. They laid there, windswept and snowbound. They looked into the eyes of the other, and saw light.</span><span class="light-mode-secret">They awoke. Their hands wrung one another's, gripped icy and tight. The first breath, and the second, heaving. One rose, and pulled the other up. They continued on, nary a word between them.</span>
 
 <script>
 (function() {
@@ -23,6 +23,8 @@ The first to fall was <span class="scramble-text">the Dreamer</span>. The cold b
       if (element.dataset.running) return;
       
       const htmlEl = element;
+
+      if (htmlEl.getClientRects().length === 0) return;
       
       // 1. Measure and lock down visual dimensions BEFORE altering text content
       const exactWidth = htmlEl.getBoundingClientRect().width;
@@ -73,6 +75,7 @@ The first to fall was <span class="scramble-text">the Dreamer</span>. The cold b
   if (!window.hasFixedScrambleListener) {
     window.hasFixedScrambleListener = true;
     document.addEventListener("nav", initFixedScrambler);
+    document.addEventListener("themechange", initFixedScrambler);
   }
 })();
 </script>
