@@ -2,4 +2,4 @@
 
 One of the four [[Immortals]]. The [[Scripture]] says that before she fell into the [[Dreaming Grotto]], she was doggedly in pursuit of something beyond simple magic.
 
-<div class="dark-mode-secret">Her kingdom's symbol is the *antler* - a deer's antler surrounded by four glyphs.</div> <div class="light-mode-secret">Her kingdom's symbol is the *feather* - a raven's feather surrounded by four glyphs.</div>
+<div class="dark-mode-secret">Her kingdom's symbol is the <i>antler</i> - a deer's antler surrounded by four glyphs.</div> <div class="light-mode-secret">Her kingdom's symbol is the <i>feather</i> - a raven's feather surrounded by four glyphs.</div>
