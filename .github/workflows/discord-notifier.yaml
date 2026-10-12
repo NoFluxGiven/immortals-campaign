@@ -98,14 +98,17 @@ jobs:
           if [ -n "$ALL_ADDED_FILES" ]; then
             while IFS= read -r file; do
               if [ -f "$file" ]; then
-                # Preserve Quartz path casing while replacing spaces with hyphens
+                # Match Quartz v5's lowercase slugs and replace spaces with hyphens
                 SLUG=$(echo "$file" | sed 's/^content\///' | sed 's/\.md$//')
-                SLUG_URL=$(echo "$SLUG" | sed 's/ /-/g' | sed 's/(/%28/g; s/)/%29/g')
+                SLUG_URL=$(echo "$SLUG" | tr '[:upper:]' '[:lower:]' | sed 's/ /-/g' | sed 's/(/%28/g; s/)/%29/g')
                 
                 # Robust Title Extraction
                 TITLE=$(grep -m 1 '^title:' "$file" | sed 's/^title:\s*//' | sed 's/^"//;s/"$//' | sed "s/^'//;s/'$//" || true)
                 if [ -z "$TITLE" ]; then
                   TITLE=$(basename "$file" .md)
+                fi
+                if [ "${TITLE,,}" = "index" ] && [ "$(dirname "$file")" != "content" ]; then
+                  TITLE=$(basename "$(dirname "$file")")
                 fi
                 
                 ADDED_BLOCK+="  • [$TITLE](<https://immortals-campaign.org/$SLUG_URL>)"$'\n'
@@ -131,12 +134,15 @@ jobs:
             while IFS= read -r file; do
               if [ -f "$file" ]; then
                 SLUG=$(echo "$file" | sed 's/^content\///' | sed 's/\.md$//')
-                SLUG_URL=$(echo "$SLUG" | sed 's/ /-/g' | sed 's/(/%28/g; s/)/%29/g')
+                SLUG_URL=$(echo "$SLUG" | tr '[:upper:]' '[:lower:]' | sed 's/ /-/g' | sed 's/(/%28/g; s/)/%29/g')
                 
                 # Robust Title Extraction
                 TITLE=$(grep -m 1 '^title:' "$file" | sed 's/^title:\s*//' | sed 's/^"//;s/"$//' | sed "s/^'//;s/'$//" || true)
                 if [ -z "$TITLE" ]; then
                   TITLE=$(basename "$file" .md)
+                fi
+                if [ "${TITLE,,}" = "index" ] && [ "$(dirname "$file")" != "content" ]; then
+                  TITLE=$(basename "$(dirname "$file")")
                 fi
                 
                 # FIX: Appended /$SLUG_URL
